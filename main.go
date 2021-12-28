@@ -7,6 +7,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/onyanko-pon/ichinen-bingo_image_genelator/html_builder"
 	"github.com/onyanko-pon/ichinen-bingo_image_genelator/image_genelator"
 )
 
@@ -28,8 +29,19 @@ func main() {
 		ImageWidth:   800,
 	}
 
-	e.GET("/image", func(c echo.Context) error {
-		imageData, _ := bingoImageGenelator.GenImage(c.Request().Context(), "hoghoge")
+	e.GET("/image.png", func(c echo.Context) error {
+		var todoList []string = []string{}
+
+		for i := 0; i < 25; i++ {
+			todoList = append(todoList, fmt.Sprintf("バンジーをする %d", i))
+		}
+		data := html_builder.HTMLData{
+			ImageURL: "https://pbs.twimg.com/profile_images/1399403028755619841/JqRHZEkb_400x400.jpg",
+			TodoList: todoList,
+		}
+		html := html_builder.BuildHTML(data)
+		fmt.Println("html", html)
+		imageData, _ := bingoImageGenelator.GenImage(c.Request().Context(), html)
 		return c.Stream(http.StatusOK, "image/png", imageData)
 	})
 
